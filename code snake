@@ -1,0 +1,471 @@
+KEY_RIGHT equ 0x13
+KEY_UP equ 0x12
+KEY_LEFT equ 0x11
+KEY_DOWN equ 0x14
+ldi d, 0x40
+ldi c, 64
+ldi b, clear_loop
+clear_loop:
+  st a, d
+  inc d
+  dec c
+  jnz b
+ldi a, 0b00011100
+st a, 0x7a
+ld a, head_pos
+st a, 0x5a
+ldi d, apple_random
+set_bank:
+  st c, bank
+  jmp d
+other_bank:
+  ldi c, 3
+  ldi d, end
+  jmp set_bank
+void db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+next db 0
+save db 0
+add_len db 0
+last_cell_adress db snake
+last_cell_pos db 4
+last_key db KEY_RIGHT
+lock_key db KEY_LEFT
+tail_adress db 0x7a
+tail_pos db 0b00010000
+head_adress db 0x7a
+head_pos db 0b00000100
+apple_adress db 0
+apple_pos db 0
+score db 2
+numX256 db 0
+terminal db 0
+terminal_art db 0
+in_out db 0b00110100
+bank db 0
+display_r   db  0b00000000, 0b00000000,
+                0b00000000, 0b00000000,
+                0b00000000, 0b00000000,
+                0b00001000, 0b00000000,
+                0b00000000, 0b00000100,
+                0b00100000, 0b00001000,
+                0b11000000, 0b00011110,
+                0b01000000, 0b00101111,
+                0b00000000, 0b00111111,
+                0b00000000, 0b00111111,
+                0b00000000, 0b00011110,
+                0b00000000, 0b00000000,
+                0b00000000, 0b00000000,
+                0b00000000, 0b00000000,
+                0b00000000, 0b00000000,
+                0b00000000, 0b00000000 
+display_b   db  0b00000000, 0b00000000,
+                0b00000000, 0b00000000,
+                0b00011100, 0b00000000,
+                0b00111111, 0b00000000,
+                0b00111111, 0b10000100,
+                0b00111101, 0b10001000,
+                0b11000001, 0b10000000,
+                0b01001111, 0b10000000,
+                0b00011111, 0b00000000,
+                0b00110000, 0b00000000,
+                0b00110000, 0b00000000,
+                0b00111111, 0b10000000,
+                0b00011111, 0b11000000,
+                0b00000000, 0b11111000,
+                0b00000000, 0b00000000,
+                0b00000000, 0b00000000
+apple_random:
+  ld a, score
+  ldi b, 56
+  add a, b
+  jnc apple_random1
+  ldi c, 3
+  ldi d, apple_random2
+  jmp set_bank
+apple_random1:
+  rnd a
+  ldi c, 7
+  and c, a
+  ldi b, 0b10000000
+  loop:
+    shr b
+    dec c
+    jns loop
+  rcl b
+  shr a
+  shr a
+  shr a
+  ldi c, 0x40
+  add a, c
+end_apple_random:
+  mov d, a
+  ldi c, 0x20
+  add d, c
+  ld c, d
+  and c, b
+  jnz apple_random
+  st a, apple_adress
+  st b, apple_pos
+  ld c, a
+  or c, b
+  st c, a
+add_score:
+  ld a, score
+  inc a
+  st a, score
+  not a
+  jnz add_last_cell
+  ldi c, 5
+  ldi d, win_start
+  jmp set_bank
+add_last_cell:
+  ld a, last_cell_pos
+  ld b, last_cell_adress
+  dec a
+  dec a
+  jns save_last_cell
+  ldi a, 6
+  inc b
+save_last_cell:
+  st a, last_cell_pos
+  st b, last_cell_adress
+key_read:
+  ldi c, 2
+  ld a, 0x3e
+  ld b, lock_key
+  xor b, a
+  jz key_read
+  ldi b, KEY_RIGHT ;key_read + 9
+  xor b, a
+  jz right
+  ldi b, KEY_LEFT
+  xor b, a
+  jz left
+  ldi b, KEY_UP
+  xor b, a
+  jz up
+  ldi b, KEY_DOWN
+  xor b, a
+  jz down
+  ld a, last_key
+  jmp key_read + 9
+right:
+  ldi d, right_start
+  jmp set_bank
+left:
+  ldi d, left_start
+  jmp set_bank
+up:
+  ldi d, up_start
+  jmp set_bank
+down:
+  ldi d, down_start
+  jmp set_bank
+void2 db 0, 0, 0, 0, 0
+right_start:
+  st a, last_key
+  ldi a, KEY_LEFT
+  st a, lock_key
+  ld a, head_pos
+  ld b, head_adress
+  shr a
+  jnc next_jmp
+  mov c, b
+  shr c
+  jc game_over
+  ldi a, 0b10000000
+  inc b
+  jmp next_jmp
+left_start:
+  st a, last_key
+  ldi a, KEY_RIGHT
+  st a, lock_key
+  ld a, head_pos
+  ld b, head_adress
+  shl a
+  jnc next_jmp
+  mov c, b
+  shr c
+  jnc game_over
+  ldi a, 0b00000001
+  dec b
+  jmp next_jmp
+up_start:
+  st a, last_key
+  ldi a, KEY_DOWN
+  st a, lock_key
+  ld a, head_pos
+  ld b, head_adress
+  ldi c, 0x60
+  xor c, b
+  shr c
+  jz game_over
+  dec b
+  dec b
+  jmp next_jmp
+down_start:
+  st a, last_key
+  ldi a, KEY_UP
+  st a, lock_key
+  ld a, head_pos
+  ld b, head_adress
+  ldi c, 0x7e
+  xor c, b
+  shr c
+  jz game_over
+  inc b
+  inc b
+next_jmp:
+  ld c, b
+  and c, a
+  jnz game_over
+  st b, save
+  ld c, head_pos
+  ld d, head_adress
+  ldi b, 0x20
+  sub d, b
+  ld b, d
+  xor b, c
+  st b, d
+  ld b, save
+  st a, head_pos
+  st b, head_adress
+  ld c, b
+  or c, a
+  st c, b
+  ldi c, 3
+  ldi d, next_jmp2
+  jmp set_bank
+game_over:
+  ldi c, 5
+  ldi d, game_over_start
+  jmp set_bank
+void3 db 0, 0, 0, 0, 0, 0, 0, 0, 0
+next_jmp2:
+  ldi c, 0x20
+  sub b, c
+  ld c, b
+  or c, a
+  st c, b
+check_collision_apple:
+  ld a, head_pos
+  ld b, apple_pos
+  xor a, b
+  jnz jmp_bank_4
+  ldi c, 0x20
+  ld a, head_adress
+  ld b, apple_adress
+  add b, c
+  xor a, b
+  jnz jmp_bank_4
+save_new_cell_pos:
+  ldi a, other_bank
+  st a, next
+  ldi a, apple_random
+  st a, end_jmp + 1
+  ldi c, 4
+  ldi d, save_head_cell
+  jmp set_bank
+jmp_bank_4:
+  ldi a, loop3_start
+  st a, next
+  ldi a, key_read
+  st a, end_jmp + 1
+  ldi c, 4
+  ldi d, delete_tail
+  jmp set_bank
+new_tail2:
+  ldi d, save_tail
+  ld b, tail_adress
+  ld a, tail_pos
+  ld c, save
+  dec c
+  js tail_down
+  dec c
+  js tail_left
+  dec c
+  js tail_up
+tail_right:
+  shr a
+  jnc d
+  ldi a, 0b10000000
+  inc b
+  jmp d
+tail_up:
+  dec b
+  dec b
+  jmp d
+tail_left:
+  shl a
+  jnc d
+  ldi a, 0b00000001
+  dec b
+  jmp d
+tail_down:
+  inc b
+  inc b
+save_tail:
+  st a, tail_pos
+  st b, tail_adress
+end:
+  clr c
+end_jmp:
+  ldi d, key_read
+  jmp set_bank
+apple_random2:
+  ld c, score
+  neg c
+  rnd d
+  ldi b, mod_d_c
+mod_d_c:
+  sub d, c
+  jns b
+add d, c
+ldi a, 0x3f
+random_loop1:
+  inc a
+  ldi b, 0b10000000
+  random_loop2:
+    ld c, a
+    and c, b
+    jnz end_random2
+    dec d
+    js end_random
+  end_random2:
+    shr b
+    jnc random_loop2
+  jmp random_loop1
+end_random:
+  clr c
+  ldi d, end_apple_random
+  jmp set_bank
+void4 db 0, 0, 0
+delete_tail:
+  ld a, tail_pos
+  ld b, tail_adress
+  ld c, b
+  xor c, a
+  st c, b
+new_tail:
+  ld a, snake
+  clr b
+  shl a
+  rcl b
+  shl a
+  rcl b
+  st b, save
+save_head_cell:
+  ld a, last_cell_pos
+  ld b, last_cell_adress
+  ld c, last_key
+  ldi d, 3
+  and c, d
+loop2:
+  shl c
+  dec a
+  jns loop2
+rcr c
+ld d, b
+or d, c
+st d, b
+ld a, next
+jmp a
+loop3_start:
+  ldi c, snake
+  sub b, c
+  inc b
+loop3:
+  ld d, c
+  inc c
+  ld a, c
+  shl a
+  rcl d
+  shl a
+  rcl d
+  dec c
+  st d, c
+  inc c
+  dec b
+  jnz loop3
+ldi c, 3
+ldi d, new_tail2
+jmp set_bank
+snake db 0b11110000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000
+fill db 0b00000000
+void5 db 0, 0, 0, 0
+game_over_text db "!niaga yrT \n!gniyalp  \nrof sknahT \n!revo emaG "
+game_over_start:
+  ldi a, 0b00000001
+  st a, 0x3e
+ldi b, game_over_start - 1
+ldi c, terminal
+ldi d, game_over_loop_text
+game_over_loop_text:
+  ld a, b
+  st a, c
+  dec b
+  js d
+hlt
+win_start:
+  ldi a, 0b00000001
+  st a, 0x3e
+  ldi b, win_text
+  ldi c, terminal
+  ldi d, win_loop_text
+win_loop_text:
+  ld a, b
+  st a, c
+  inc b
+  jnz d
+ldi b, onigiri_size
+inc c
+ldi d, onigiri
+onigiri_loop:
+  ld a, d
+  st a, c
+  inc d
+  dec b
+  jnz onigiri_loop
+hlt
+onigiri db
+0b00111000,
+0b01000100,
+0b01110010,
+0b01110010,
+0b01000100,
+0b00111000
+onigiri_size equ $ - onigiri
+void6 db 0, 0, 0, 0, 0
+win_text db "  You won!\n\nTake an\nonigiri — "
