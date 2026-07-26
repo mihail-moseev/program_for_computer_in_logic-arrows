@@ -1,0 +1,188 @@
+RIGHT equ 0x13
+LEFT equ 0x11
+jmp start
+text db "\n\nSINNET\b\t"
+start:
+  ldi a, "\n"
+  st a, 0x01
+  ldi d, text_loop
+  ldi c, start - 1
+  ldi b, terminal
+text_loop:
+  ld a, c
+  st a, b
+  dec c
+  jnz d
+ldi d, add_score
+set_bank:
+  st c, bank
+  jmp d
+void db 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0
+speedY db 0x02
+speedX db ball_left
+ball_pos db 0b00000100
+ball_adress db 0x46
+score db 0xff
+scoreX256 db 0xff
+terminal db 0
+terminal_art db 0
+in_out db 0b00010101
+bank db 0
+display db 0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000100, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000011, 0b10000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000
+add_score:
+  ld a, score
+  inc a
+  st a, score
+  jnz key_read
+  ld a, scoreX256
+  inc a
+  st a, scoreX256
+key_read:
+  ld b, 0x3e
+  ldi a, LEFT
+  xor a, b
+  jz left
+  ldi a, RIGHT
+  xor a, b
+  jnz ball_move
+right:
+  ldi b, 0x59
+  ld a, b
+  shr a
+  jc ball_move
+  dec b
+  ld a, b
+  rcr a
+  st a, b
+  inc b
+  ld a, b
+  rcr a
+  st a, b
+  jmp ball_move
+left:
+  ldi b, 0x58
+  ld a, b
+  shl a
+  jc ball_move
+  inc b
+  ld a, b
+  rcl a
+  st a, b
+  dec b
+  ld a, b
+  rcl a
+  st a, b
+ball_move:
+  ld a, ball_adress
+  clr c
+  st c, a
+  ld b, speedY
+  add a, b
+  test b
+  jns ball_jmp
+  ldi c, 0x40
+  xor c, a
+  shr c
+  jnz ball_jmp
+  ldi b, 0x02
+  st b, speedY
+ball_jmp:
+  ldi d, check_game_over
+  ld b, ball_pos
+  ld c, speedX
+  jmp c
+ball_left:
+  shl b
+  jnc d
+  shr a
+  jnc changeX_left
+  ldi b, 0b00000001;
+  rcl a
+  dec a
+  jmp d
+  changeX_left:
+    rcl a
+    ldi c, ball_right
+    st c, speedX
+    ldi b, 0b01000000
+    jmp d
+ball_right:
+  shr b
+  jnc d
+  shr a
+  jc changeX_right
+  ldi b, 0b10000000;
+  rcl a
+  inc a
+  jmp d
+  changeX_right:
+    rcl a
+    ldi c, ball_left
+    st c, speedX
+    ldi b, 0b00000010
+check_game_over:
+  st a, ball_adress
+  st b, ball_pos
+  st b, a
+  ld c, speedY
+  test c
+  js key_read
+  add a, c
+  ldi c, 0x58
+  xor c, a
+  shr c
+  jnz key_read
+  ld c, a
+  and c, b
+  jz game_over
+  ldi c, 0xfe ; -2
+  st c, speedY
+  jmp add_score
+game_over:
+  ldi c, 2
+  ldi d, game_over_start
+  jmp set_bank
+void2 db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+game_over_start:
+  ldi b, image_size
+  ldi c, img
+  ldi d, 0x44
+game_over_loop:
+  ld a, c
+  st a, d
+  inc c
+  inc d
+  dec b
+  jnz game_over_loop
+hlt
+img db
+0b01100000, 0b00000000,
+0b10001001, 0b10100010,
+0b10100101, 0b01010101,
+0b10101101, 0b01010110,
+0b01101101, 0b01010011,
+0b00000000, 0b00000000,
+0b00000000, 0b00000000,
+0b01100000, 0b00000000,
+0b10010101, 0b00100111,
+0b10010101, 0b01010100,
+0b10010101, 0b01100100,
+0b01100010, 0b00110100
+image_size equ $ - img
