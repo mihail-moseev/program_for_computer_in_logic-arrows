@@ -97,13 +97,13 @@ apple_random1:
   shr a
   ldi c, 0x40
   add a, c
-end_apple_random:
   mov d, a
   ldi c, 0x20
   add d, c
   ld c, d
   and c, b
   jnz apple_random
+end_apple_random:
   st a, apple_adress
   st b, apple_pos
   ld c, a
