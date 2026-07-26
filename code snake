@@ -131,10 +131,10 @@ save_last_cell:
   st b, last_cell_adress
 key_read:
   ldi c, 2
-  ld a, 0x3e
+  ld a, 0x3e ;key_read + 2
   ld b, lock_key
   xor b, a
-  jz key_read
+  jz key_read + 2
   ldi b, KEY_RIGHT ;key_read + 9
   xor b, a
   jz right
@@ -258,7 +258,7 @@ check_collision_apple:
   add b, c
   xor a, b
   jnz jmp_bank_4
-save_new_cell_pos:
+eating_apple:
   ldi a, other_bank
   st a, next
   ldi a, apple_random
@@ -321,7 +321,7 @@ mod_d_c:
   sub d, c
   jns b
 add d, c
-ldi a, 0x3f
+ldi a, 0x5f
 random_loop1:
   inc a
   ldi b, 0b10000000
@@ -336,10 +336,11 @@ random_loop1:
     jnc random_loop2
   jmp random_loop1
 end_random:
+  ldi c, 0x20
+  sub a, c
   clr c
   ldi d, end_apple_random
   jmp set_bank
-void4 db 0, 0, 0
 delete_tail:
   ld a, tail_pos
   ld b, tail_adress
@@ -429,9 +430,9 @@ game_over_text db "!niaga yrT \n!gniyalp  \nrof sknahT \n!revo emaG "
 game_over_start:
   ldi a, 0b00000001
   st a, 0x3e
-ldi b, game_over_start - 1
-ldi c, terminal
-ldi d, game_over_loop_text
+  ldi b, game_over_start - 1
+  ldi c, terminal
+  ldi d, game_over_loop_text
 game_over_loop_text:
   ld a, b
   st a, c
