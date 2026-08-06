@@ -1,35 +1,36 @@
-RIGHT equ 0x13
-LEFT equ 0x11
-jmp start
-text db "\n\nSINNET\b\t"
+RIGHT equ 0x13 ;код клавиши вправо
+LEFT equ 0x11 ;код клавиши влево
+jmp start ;переходи к старту
+text db "\n\nSINNET\b\t" ;TENNIS наоборот
 start:
-  ldi a, "\n"
+  ldi a, "\n" ;восстанавливаем последний символ
   st a, 0x01
-  ldi d, text_loop
-  ldi c, start - 1
-  ldi b, terminal
+  ldi d, text_loop ;адрес цикла
+  ldi c, start - 1 ;адрес текста
+  ldi b, terminal ;адрес вывода в терминал
 text_loop:
-  ld a, c
-  st a, b
-  dec c
+  ld a, c ;читаем символ
+  st a, b ;выводи в терминал
+  dec c ;если символы не закончились, продолжаем выводить
   jnz d
-ldi d, add_score
+ldi d, add_score ;переходи к добалению счёта
 set_bank:
   st c, bank
   jmp d
 void db 0, 0, 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0, 0, 0,
 0, 0, 0, 0, 0, 0, 0
-speedY db 0x02
-speedX db ball_left
-ball_pos db 0b00000100
-ball_adress db 0x46
-score db 0xff
+speedY db 0x02 ;скорость y (изначально вниз)
+speedX db ball_left ;напрвление по x (изначально влево)
+ball_pos db 0b00000100 ;позицию мяча в байте
+ball_adress db 0x46 ;адрес мяча на дисплее
+score db 0xff ;счёт (изначльно -1, чтобы при старте было 0)
 scoreX256 db 0xff
-terminal db 0
-terminal_art db 0
-in_out db 0b00010101
-bank db 0
+terminal db 0 ;выводи символов
+terminal_art db 0 ;выводи графики (не используется)
+in_out db 0b00010101 ;ввод-вывод (подключаем монохромный дисплей, цифровой индикатор и терминал)
+bank db 0 ;банк
+;дисплей
 display db 0b00000000, 0b00000000,
 0b00000000, 0b00000000,
 0b00000000, 0b00000000,
@@ -47,36 +48,37 @@ display db 0b00000000, 0b00000000,
 0b00000000, 0b00000000,
 0b00000000, 0b00000000
 add_score:
-  ld a, score
-  inc a
-  st a, score
-  jnz key_read
-  ld a, scoreX256
-  inc a
-  st a, scoreX256
+  ld a, score ;читаем счёт
+  inc a ;увеличиваем
+  st a, score ;сохраняем
+  jnz key_read ;если не вышли за пределы байта переходим к чтению клавиши
+  ld a, scoreX256 ;если вышли, то читаем счёт x256
+  inc a ;увеличиваем
+  st a, scoreX256 ;сохраняем
 key_read:
-  ld b, 0x3e
-  ldi a, LEFT
+  ld b, in_out ;читаем клавишу
+  ldi a, LEFT ;влево
   xor a, b
   jz left
-  ldi a, RIGHT
+  ldi a, RIGHT ;вправо
   xor a, b
-  jnz ball_move
+  jnz ball_move ;если клавиша не нажата, то переходим к дивжению мяча
 right:
-  ldi b, 0x59
-  ld a, b
-  shr a
-  jc ball_move
-  dec b
-  ld a, b
-  rcr a
-  st a, b
-  inc b
-  ld a, b
-  rcr a
-  st a, b
-  jmp ball_move
+  ldi b, 0x59 ;правый байт ракетки
+  ld a, b ;читаем
+  shr a ;сдвигаем
+  jc ball_move ;если упёрлись в стену, то переходи к движению мяча
+  dec b ;левый байт
+  ld a, b ;читаем
+  rcr a ;сдвигаем
+  st a, b ;сохраняем
+  inc b ;правый байт
+  ld a, b ;читаем
+  rcr a ;сдвигаем
+  st a, b ;сохраняем
+  jmp ball_move ;переходи к движению мяча
 left:
+  ;тоже самое, что и для правой, но наоборот
   ldi b, 0x58
   ld a, b
   shl a
@@ -90,40 +92,42 @@ left:
   rcl a
   st a, b
 ball_move:
-  ld a, ball_adress
-  clr c
+  ld a, ball_adress ;читаем адрес мяча
+  clr c ;стираем мяч
   st c, a
-  ld b, speedY
-  add a, b
-  test b
+  ld b, speedY ;читаем движение по y
+  add a, b ;добавляем
+  test b ;если двигаемся вниз, то переходим к движению мяча по горизонтали
   jns ball_jmp
-  ldi c, 0x40
+  ldi c, 0x40 ;если двигаемся вверх, то проверяем на столкновение с верхней стороной
   xor c, a
   shr c
-  jnz ball_jmp
+  jnz ball_jmp ;если столкновение есть, то меняем напрвление мяча вниз
   ldi b, 0x02
   st b, speedY
 ball_jmp:
-  ldi d, check_game_over
-  ld b, ball_pos
-  ld c, speedX
+  ldi d, check_game_over ;сохраняем адрес, чтобы программа занимала меньше байт
+  ld b, ball_pos ;читаем позицию мяча заранее
+  ld c, speedX ;читаем напрвление мяча по x
   jmp c
 ball_left:
-  shl b
-  jnc d
-  shr a
+  shl b ;сдвигаем мяч влево
+  jnc d ;если нет перехода между байтами, то переходим к проверке на конец игры
+  shr a ;если адрес чётный, то делаем отскок мяча от стенки
   jnc changeX_left
-  ldi b, 0b00000001;
+  ldi b, 0b00000001 ;если адрес нечётный то делаем перход между байтами
   rcl a
   dec a
   jmp d
   changeX_left:
+    ;отскок мяча от стнеки
     rcl a
     ldi c, ball_right
     st c, speedX
     ldi b, 0b01000000
     jmp d
 ball_right:
+  ;тоже самое, что и для левой, но наоборот
   shr b
   jnc d
   shr a
@@ -138,41 +142,43 @@ ball_right:
     st c, speedX
     ldi b, 0b00000010
 check_game_over:
-  st a, ball_adress
-  st b, ball_pos
-  st b, a
-  ld c, speedY
-  test c
+  st a, ball_adress ;сохраняем адрес мяча
+  st b, ball_pos ;сохраняем позицию мяча
+  st b, a ;выводим мяч на экран
+  ld c, speedY ;читаем напрваление мяча по y
+  test c ;если двигаемся вверх, то переходи к чтению клавиши
   js key_read
-  add a, c
+  add a, c ;если вниз, то проверям столкновение с ракеткой
   ldi c, 0x58
   xor c, a
   shr c
-  jnz key_read
-  ld c, a
+  jnz key_read ;если мяч не у ракетки, то переходим к чтению клавиши
+  ld c, a ;если мяч у ракетки, но он не отбит, то переходи к концу игры
   and c, b
   jz game_over
+  ;если мяч отбит, то меняем напрвление мяча по вертикали и переходим к увеличиванию счёта
   ldi c, 0xfe ; -2
   st c, speedY
   jmp add_score
+;переходи к выводу на дисплей Game over
 game_over:
   ldi c, 2
   ldi d, game_over_start
   jmp set_bank
 void2 db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 game_over_start:
-  ldi b, image_size
-  ldi c, img
-  ldi d, 0x44
+  ldi b, image_size ;размер изображения
+  ldi c, img ;адрес изображения
+  ldi d, 0x44 ;адрес вывода изображения
 game_over_loop:
-  ld a, c
-  st a, d
+  ld a, c ;читаем фрагмент иозбражения
+  st a, d ;сохраняем на диспллей
   inc c
   inc d
-  dec b
+  dec b ;если фрагменты ещё остались, то повторяем итерацию
   jnz game_over_loop
-hlt
-img db
+hlt ;конец
+img db ;изображение
 0b01100000, 0b00000000,
 0b10001001, 0b10100010,
 0b10100101, 0b01010101,
@@ -185,7 +191,7 @@ img db
 0b10010101, 0b01010100,
 0b10010101, 0b01100100,
 0b01100010, 0b00110100
-image_size equ $ - img
+image_size equ $ - img ;размер изображения
 
 
 
