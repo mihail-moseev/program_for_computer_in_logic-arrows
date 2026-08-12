@@ -21,6 +21,6 @@
 
 ---
 
-### сапёр
+### minesweeper
 
 [![minesweeper](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20minesweeper.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20minesweeper.asm)
