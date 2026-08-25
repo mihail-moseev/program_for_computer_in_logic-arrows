@@ -77,6 +77,9 @@ display_b db
 0b00000000, 0b00000100,
 0b00000000, 0b00000100,
 0b00000000, 0b00001110
+;BANK ASK содержит опрос пользователя
+;BANK RANDOM содержит генерацию мин
+;BANK ASK
 ask_start:
   ldi d, terminal ;адрес вывода
 ask:
@@ -131,6 +134,7 @@ add a, b
 st a, cursor ;сохраняем курсор
 ask_jmp:
   jmp random ;заменяемый адрес перехода
+;BANK RANDOM
 random:
   ldi b, 1 ;чтобы мина изначально не попала на ввод пользователя, временно сохраняем туда мину
   st b, a
@@ -174,6 +178,7 @@ check_mine_jmp:
   ldi d, check_mine
   jmp set_bank
 void2 db 0, 0, 0
+BANK CENTER - содержит обработку центральных клеток на поле
 check_mine:
   ld b, a ;читаем клетку, которую указал пользователь
   dec b ;если попали на мину, переходим к концу игры
@@ -274,6 +279,9 @@ vertical_side_right_jmp:
   ldi b, vertical_side_right
   jmp set_bank2
 void3 db 0, 0, 0, 0, 0, 0, 0
+;BANK HORIZONTAL - содержит обработку горизонтальных сторон поля
+;BANK CORNER UP - содержит обработку верхних углов поля
+;BANK HORIZONTAL
 ;подсчёт для верхней клетки
 horizontal_side_up:
   ld a, row ;читаем колонку
@@ -336,6 +344,7 @@ next14:
   jnz end_counter2
   inc a
   jmp end_counter2 ;переход к выводу поля
+;BANK CORNER UP
 ;подсчёт для верхней левой клетки
 corner_up_left:
   ldi a, INC_D ;заменяем операцию на движение курсора вправо
@@ -381,6 +390,10 @@ corner_down_right_jmp: ;переход на подсчёт для нижней �
   ldi b, corner_down_right
   jmp set_bank2
 void4 db 0, 0, 0, 0, 0, 0, 0, 0
+;BANK VERTICAL - содержит обработку вертикальных сторон поля
+;BANK CORNER DOWN - содержит обработку нижних углов поля
+;BANK GAME OVER - меняет поле на поражение
+;BANK VERTICAL
 ;подсчёт для левой клетки
 vertical_side_left:
   ldi a, INC_D ;заменяем операцию на движение курсора вправо
@@ -432,6 +445,7 @@ next24:
   jnz end_counter3
   inc a
   jmp end_counter3 ;переход к отрисовке поля
+;BANK CORNER DOWN
 ;подсчёт для нижней левой клетки
 corner_down_left:
   ldi a, INC_D ;заменяем операцию на смещение курсора вправо
@@ -467,6 +481,7 @@ end_counter3: ;переход к отрисовке поля
   ldi c, 5
   ldi d, show_counter
   jmp set_bank
+;BANK GAME OVER
 game_over: ;поражение
   ldi a, end ;меняем адрес перехода после отрисовки поля
   st a, adress_end
@@ -490,6 +505,9 @@ game_over: ;поражение
   ldi d, draw_field
   jmp set_bank
 void db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+;BANK WIN - меняет поле на победу
+;BANK DRAW - выводит поле в терминал
+;BANK WIN
 show_counter:
   test a ;если на счётчике ноль, то вместо нуля показываем пустую клетку
   jz zero
@@ -513,6 +531,7 @@ check_win:
   st a, emoji
   ldi a, " " ;убираем enter
   st a, enter
+;BANK DRAW
 draw_field:
   ldi c, field ;адрес поля
   ldi d, terminal ;адрес вывода символов
