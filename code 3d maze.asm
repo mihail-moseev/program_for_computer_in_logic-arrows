@@ -148,10 +148,10 @@ check_player_wall:
   ldi c, 7
   and c, a
   ldi b, 0b10000000
-  loop:
+  check_player_loop:
     shr b
     dec c
-    jns loop
+    jns check_player_loop
   rcl b
   shr a
   shr a
