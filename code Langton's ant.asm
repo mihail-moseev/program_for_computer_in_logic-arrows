@@ -1,18 +1,20 @@
-out_display equ 0x80
-out_indicator equ 0x10
-indicator equ 0x40
-ldi b, clear_loop
-ldi c, 32
-ldi d, display
+out_display equ 0x80 ;дисплей
+out_indicator equ 0x10 ;индикатор
+indicator equ 0x40 ;вывод на индикатор
+;стираем заставку
+ldi b, clear_loop ;адрес цикла для его ускорения
+ldi c, 32 ;кол-во итераций
+ldi d, display ;дисплей
+;регситр a пустой
 clear_loop:
-  st a, d
-  inc d
-  dec c
+  st a, d ;очищаем байт
+  inc d ;следующий байт
+  dec c ;если байты ещё остались продолжаем очистку
   jnz b
 loop:
-  ld a, x
+  ld a, x ;читаем координаты
   ld b, y
-xy_to_pos:
+xy_to_pos: ;преобразовываем координаты в позицию и адрес на дисплее
   ldi c, 7
   and c, a
   shr a
@@ -21,41 +23,41 @@ xy_to_pos:
   shl b
   add b, a
   ldi a, display
-  add b, a
+  add b, a ;в регситре b адрес
   shl a
   pos_loop:
     shr a
     dec c
     jns pos_loop
-  rcl a
-ld d, rotate
-ld c, b
-xor c, a
-st c, b
+  rcl a ;в регистре a позиция
+ld d, rotate ;заранее читаем направление
+ld c, b ;читаем байт дисплея
+xor c, a ;меняем цвет клетки на противоположный
+st c, b ;выводим
 and c, a
 jz black
-white:
-  inc d
+white: ;если клетка была белой, поворочиваем направо
+  inc d ;прибавление 1 - поврот направо
   jmp end_color
-black:
-  dec d
+black: ;если клетка была чёрной, поворочиваем налево
+  dec d ;убавление 1 - поврот налево
 end_color:
-  ldi a, 3
+  ldi a, 3 ;преобрзуем напрвление в число от 0 до 3
   and d, a
-  st d, rotate
-  jmp read_change_xy
+  st d, rotate ;сохраняем
+  jmp read_change_xy ;переходим к изменению позиции
 rotates db
-0, 1,
-0 - 1, 0,
-0, 0 - 1,
-1, 0
-rotate db 1
-step_count db 0
-x db 8
+0, 1, ;направление вниз - изменяем x на 0, y на 1
+0 - 1, 0, ;направление влево - изменяем x на -1, y на 0
+0, 0 - 1, ;направление вверх - изменяем x на 0, y на -1
+1, 0 ;направление вправо - изменяем x на 1, y на 0
+rotate db 1 ;направление (изначально влево)
+step_count db 0 ;кол-во шагов, которое прошёл муравей
+x db 8 ;координаты муравья (изначально в центре)
 y db 8
-in db 0
-out db out_display
-display db          0b00000000, 0b00000000,
+in db 0 ;ввод (не используется)
+out db out_display ;вывод (подключаем дисплей)
+display db          0b00000000, 0b00000000, ;заставка
                     0b00000000, 0b00000000,
                     0b10010000, 0b00000000,
                     0b01001000, 0b00000000,
@@ -71,34 +73,34 @@ display db          0b00000000, 0b00000000,
                     0b00000000, 0b00000000,
                     0b00000000, 0b00000000,
                     0b00000000, 0b00000000
-read_change_xy:
-  shl d
-  ldi a, rotates
-  add a, d
-  ld b, a
-  inc a
-  ld c, a
-  ld a, x
-  add b, a
-  ld a, y
-  add c, a
-  ldi a, 15
+read_change_xy: ;изменяем положение муравья
+  shl d ;уиножаем направление на 2
+  ldi a, rotates ;адрес направлений
+  add a, d ;адрес текущего направления
+  ld b, a ;читаем движение по x
+  inc a ;прибавляем 1
+  ld c, a ;читаем движение по y
+  ld a, x ;читаем координату x
+  add b, a ;изменяем по направлению
+  ld a, y ;читаем координату y
+  add c, a ;изменяем по направлению
+  ldi a, 15 ;преобразуем новые координаты в значение от 0 до 15 (делаем зацикленный экран)
   and b, a
   and c, a
-  st b, x
+  st b, x ;сохраняем новые координаты
   st c, y
-output_step:
-  ld b, display
-  ldi a, out_indicator
+output_step: ;выводим кол-во шагов на цифровой индикатор
+  ld b, display ;сохраняем байт дисплея
+  ldi a, out_indicator ;подключаем цифровой индикатор
   st a, out
-  ld a, step_count
-  inc a
-  st a, step_count
-  st a, indicator
-  ldi a, out_display
+  ld a, step_count ;читаем кол-во шагов
+  inc a ;увеличиваем
+  st a, step_count ;сохраняем
+  st a, indicator ;выводим
+  ldi a, out_display ;подключаем дисплей
   st a, out
-  st b, display
-  jmp loop
+  st b, display ;восстанавливаем байт дисплея
+  jmp loop ;повторяем итерацию
 
 
 ;дискета:
