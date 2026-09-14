@@ -36,3 +36,9 @@
 ### Langton's ant
 
 [![Langton's ant](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20Langton's%20ant.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20Langton's%20ant.asm)
+
+---
+
+### GMN (Guess My Num)
+
+[![Guess My Num](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20GMN.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20GMN.asm)
