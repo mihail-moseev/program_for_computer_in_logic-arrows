@@ -117,17 +117,17 @@ lose:
 end:
   hlt ;конец
 ;стартовый текст
-title db "Guess   1…99 in 6 tries."
+title db "Guess   1…99 in 6 tries.", 0
 ;текст попытки
-tries_text db "  Try 1:"
+tries_text db "  Try 1:", 0
 ;текст, если число больше
-higher_text db "  higher"
+higher_text db "  higher", 0
 ;текст, если число меньше
-lower_text db "   lower"
+lower_text db "   lower", 0
 ;текст, если число угаданно
-win_text db "You win!"
+win_text db "You win!", 0
 ;текст если попытки закончились
-lose_text db "You lose"
+lose_text db "You lose", 0
 
 
 
