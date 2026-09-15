@@ -1,74 +1,74 @@
-terminal equ 0x40
-indicator equ 0x10
-tries equ tries_text + 6
-ldi c, title
-ldi d, wait
+terminal equ 0x40 ;байт подключения терминала
+indicator equ 0x10 ;байт подключения цифрового индикатора
+tries equ tries_text + 6 ;адрес счётчика попыток
+ldi c, title ;адрес стартового текста
+ldi d, wait ;адрес перехода после вывода
 text_start:
-  ldi b, terminal
+  ldi b, terminal ;подключаем терминал и выводим текст
   st b, out
   text_loop:
-    ld a, c
-    or a, 0
-    jz d
-    st a, b
-    inc c
-    jmp text_loop
-wait:
+    ld a, c ;читаем символ
+    or a, 0 ;если символ = 0, значит текст выведен
+    jz d ;поэтому переходим по адресу
+    st a, b ;выводим символ
+    inc c ;следующий символ
+    jmp text_loop ;продолжаем выводить
+wait: ;ждём реакции пользователя
   ld a, in
   or a, 0
   jz wait
 start:
-  ldi a, 0x30
+  ldi a, 0x30 ;обновляем счётчик
   st a, tries
 guess_num:
-  rnd a
+  rnd a ;генерируем число от 0 до 98
   ldi b, 98
   sub b, a
   jc guess_num
-  inc a
-  st a, num
+  inc a ;прибавляем 1 и получаем число от 1 до 99
+  st a, num ;сохраняем число
 try:
-  ld a, tries
-  inc a
-  ldi b, 0x37
+  ld a, tries ;читаем счётчик попыток
+  inc a ;увеличиваем
+  ldi b, 0x37 ;если попыток больше 6, то переходим на проигрыш
   xor b, a
   jz lose
-  st a, tries
-  ldi c, tries_text
-  ldi d, num1
-  jmp text_start
-space:
-  ldi c, 0x20
+  st a, tries ;иначе сохраняем счётчик
+  ldi c, tries_text ;адрес текста попытки
+  ldi d, num1 ;адрес чтения первой цифры
+  jmp text_start ;выводим текст попытки
+space: ;выравниваем текст в терминале, если введено однозначное число
+  ldi c, 0x20 ;для этого используем пробел
   st c, output
-  jmp cmp
+  jmp cmp ;переходим к сравнению
 void db 0, 0, 0, 0, 0
-num db 0
-lives db 5
-in db 0
-out db indicator
-output db 5
+num db 0 ;число
+lives db 5 ;кол-во жизней
+in db 0 ;ввод
+out db indicator ;вывод (подлючаем цифровой индикатор)
+output db 5 ;адрес вывода в терминал и на цифровой индикатор (при загрузке показываем кол-во жизней)
 num1:
-  exp c
-  st c, in
-  ld a, in
-  mov c, a
-  ldi b, 0x31
+  exp c ;в c либо 0, либо 255 - это не символы цифр.
+  st c, in ;тем самым обнуляем порт ввода
+  ld a, in ;читаем ввод
+  mov c, a ;копируем символ
+  ldi b, 0x31 ;первая цифра от 1 до 9
   sub a, b
   jc num1
   inc a
   ldi b, 9
   sub b, a
   jc num1
-  st c, output
-  mov d, a
+  st c, output ;выводим цифру
+  mov d, a ;сохраняем цифру
 num2:
-  exp c
+  exp c ;обнуляем ввод по такому же принципу
   st c, in
-  ld a, in
-  ldi c, 0x0A
+  ld a, in ;читаем ввод
+  ldi c, 0x0A ;если пользователь ввёл enter, то он ввёл однозначное число
   xor c, a
   jz space
-  mov c, a
+  mov c, a ;тоже самое, но для второй цифры от 0 до 9
   ldi b, 0x30
   sub a, b
   jc num2
@@ -77,54 +77,59 @@ num2:
   jc num2
   st c, output
 mul:
-  mov b, a
-  mov a, d
+  mov b, a ;копируем вторую цифру
+  mov a, d ;умножаем первую на 10
   shl d
   shl d
   add d, a
   shl d
-  mov a, b
+  mov a, b ;прибавляем вторую и получаем итоговое число
   add d, a
-cmp:
-  ld a, num
+cmp: ;сравниваем
+  ld a, num ;читаем загаданное число
   sub a, d
-  jz win
-  jc lower
-higher:
-  ldi c, higher_text
-  ldi d, try
-  jmp text_start
+  jz win ;если угадали, переходим к победе
+  jc lower ;если число меньше, выводим это в терминал
+higher: ;если число больше, выводим это в терминал
+  ldi c, higher_text ;адрес текста
+  ldi d, try ;адрес перехода
+  jmp text_start ;выводим текст
 lower:
-  ldi c, lower_text
-  ldi d, try
-  jmp text_start
+  ldi c, lower_text ;адрес текста
+  ldi d, try ;адрес перехода
+  jmp text_start ;выводим текст
 win:
-  ldi c, win_text
-  ldi d, start
-  jmp text_start
+  ldi c, win_text ;адрес текста
+  ldi d, start ;адрес перехода
+  jmp text_start ;выводим текст
 lose:
-  ldi c, lose_text
-  ldi d, start
-  ldi a, indicator
+  ldi c, lose_text ;адрес текста
+  ldi d, start ;адрес перехода
+  ldi a, indicator ;подклбчаем цифровой индикатор
   st a, out
-  ld a, lives
-  dec a
-  st a, lives
-  st a, output
-  jnz text_start
-  ldi d, end
+  ld a, lives ;читаем кол-во жизней
+  dec a ;уменьшаем
+  st a, lives ;сохраняем
+  st a, output ;выводим
+  jnz text_start ;если жизни ещё остались, выводим текст и начинаем заного
+  ldi d, end ;если нет, выводим текст и завершаем программу
   jmp text_start
 end:
-  hlt
-title db 0x47, 0x4D, 0x4E, 0x20, 0x62,
-0x65, 0x72, 0x20, 0x31, 0x85, 0x39,
-0x39, 0x20, 0x69, 0x6E, 0x20, 0x36,
-0x20, 0x74, 0x72, 0x69, 0x65, 0x73, 0x2E, 0
+  hlt ;конец
+;стартовый текст
+title db 0x47, 0x75, 0x65, 0x73, 0x73, 0x20, 0x20, 0x20,
+0x31, 0x85, 0x39, 0x39, 0x20, 0x69, 0x6E, 0x20, 0x36,
+0x20, 0x74, 0x72, 0x69, 0x65, 0x73, 0x2E, 0 ;Guess   1…99 in 6 tries.
 tries_text db 0x20, 0x20, 0x54, 0x72, 0x79, 0x20, 0x30, 0x3A, 0
-higher_text db  0x20, 0x20, 0x68, 0x69, 0x67, 0x68, 0x65, 0x72, 0
-lower_text db 0x20, 0x20, 0x20, 0x6C, 0x6F, 0x77, 0x65, 0x72, 0
-win_text db 0x59, 0x6F, 0x75, 0x20, 0x77, 0x69, 0x6E, 0x21, 0
-lose_text db 0x59, 0x6F, 0x75, 0x20, 0x6C, 0x6F, 0x73, 0x65, 0
+;текст, если число больше
+higher_text db  0x20, 0x20, 0x68, 0x69, 0x67, 0x68, 0x65, 0x72, 0 ;  higher
+;текст, если число меньше
+lower_text db 0x20, 0x20, 0x20, 0x6C, 0x6F, 0x77, 0x65, 0x72, 0 ;   lower
+;текст, если число отгадано
+win_text db 0x59, 0x6F, 0x75, 0x20, 0x77, 0x69, 0x6E, 0x21, 0 ;You win!
+;текст, если попытки закончились
+lose_text db 0x59, 0x6F, 0x75, 0x20, 0x6C, 0x6F, 0x73, 0x65, 0 ;You lose
+
 
 
 ;дискета:
