@@ -1,36 +1,36 @@
-KEY_RIGHT equ 0x13
-KEY_LEFT equ 0x11
-BAT_RIGHT equ 0x59
-BAT_LEFT equ 0x58
+KEY_RIGHT equ 0x13 ;код клавиши вправо
+KEY_LEFT equ 0x11 ;код клавиши влево
+BAT_RIGHT equ 0x59 ;правый байт ракетки
+BAT_LEFT equ 0x58 ;левый байт ракетки
 add_score:
-  ldi b, 0x10
+  ldi b, 0x10 ;подключаем цифровой индикатор
   st b, out
-  ld b, score
-  inc b
-  st b, score
-  st b, display
-  ldi b, 0x80
+  ld b, score ;читаем счёт
+  inc b ;увеличиваем
+  st b, score ;сохраняем
+  st b, display ;выводим
+  ldi b, 0x80 ;подключаем дисплей
   st b, out
-  mov a, 0
+  mov a, 0 ;очищаем байт дисплея
   st a, display
 key_read:
-  ld b, in
-  mov a, 0
+  ld b, in ;читаем клавишу
+  mov a, 0 ;обнуляем порт
   st a, in
-  ldi a, KEY_RIGHT
+  ldi a, KEY_RIGHT ;клавиша вправо
   xor a, b
   jz bat_right
-  ldi a, KEY_LEFT
+  ldi a, KEY_LEFT ;клавиша влево
   xor a, b
   jz bat_left
-  jmp ball_clear
-coord_to_pos:
-  shl b
+  jmp ball_clear ;если клавиша не нажата, переходим сразу к обработке мяча
+coord_to_pos: ;функция преобразования координат в позицию на дисплее
+  shl b ;преобразовываем две координаты в 1 байт
   shl b
   shl b
   shl b
   or a, b
-  ldi c, 7
+  ldi c, 7 ;определяем позицию в байте
   and c, a
   ldi b, 0b10000000
   shr_loop:
@@ -38,20 +38,20 @@ coord_to_pos:
     dec c
     jns shr_loop
   rcl b
-  shr a
+  shr a ;определяем адрес на дисплее
   shr a
   shr a
   ldi c, 0x40
   add a, c
-  jmp d
-score db 255
-speed_x db 1
-speed_y db 0 - 1
-ball_x db 0x07
-ball_y db 0x0b
-in db 0
-out db 0x80
-display db
+  jmp d ;переходим дальше
+score db 0 - 1 ;очки (изначально -1, чтобы в начале программы вывести 0)
+speed_x db 1 ;скорость мяча по x
+speed_y db 0 - 1 ;скорость мяча по y
+ball_x db 0x07 ;координата мяча по x
+ball_y db 0x0b ;координата мяча по y
+in db 0 ;ввод
+out db 0x80 ;вывод (подключаем дисплей)
+display db ;дисплей
 0b00000000, 0b00000000,
 0b00000000, 0b00000000,
 0b00000000, 0b00000000,
@@ -68,21 +68,21 @@ display db
 0b00000000, 0b00000000,
 0b00000000, 0b00000000,
 0b00000000, 0b00000000
-bat_right:
-  ldi b, BAT_RIGHT
-  ld a, b
+bat_right: ;смещение ракетки вправо
+  ldi b, BAT_RIGHT ;читаем байт правой ракетки
+  ld a, b ;проверяем столкновение со стеной
   shr a
-  jc ball_move_x
-  dec b
-  ld a, b
+  jc ball_move_x ;если столкновение есть, переходим к движению мяча
+  dec b ;иначе переключаемся на левый байт
+  ld a, b ;сдвигаем
   shr a
   st a, b
-  inc b
-  ld a, b
+  inc b ;правый байт
+  ld a, b ;сдвигаем с переносом из левого
   rcr a
   st a, b
-  jmp ball_clear
-bat_left:
+  jmp ball_clear ;переходим к движению мяча
+bat_left: ;смещение ракетки влево (то же самое, что и для правой, но наоборот)
   ldi b, BAT_LEFT
   ld a, b
   shl a
@@ -95,95 +95,95 @@ bat_left:
   ld a, b
   rcl a
   st a, b
-ball_clear:
-  ld a, ball_x
+;движение мяча
+ball_clear: ;стираем мяч
+  ld a, ball_x ;читаем x и y мяча
   ld b, ball_y
-  shr a
+  shr a ;преобразуем в адрес
   shr a
   shr a
   shl b
   add b, a
   ldi a, 0x40
   add b, a
-  mov a, 0
+  mov a, 0 ;стираем байт
   st a, b
 ball_move_y:
-  ld a, ball_y
+  ld a, ball_y ;читаем y мяча
 check_up:
-  or a, 0
+  or a, 0 ;если находимся не в верхней части, переходим к проверке скорости
   jnz check_speed_y
-  ldi b, 1
+  ldi b, 1 ;иначе меняем скорость
   st b, speed_y
-  jmp add_y
+  jmp add_y ;и переходим к изменению координаты
 check_speed_y:
-  ld c, speed_y
-  inc c
+  ld c, speed_y ;читаем скорость
+  inc c ;если двигаемся вверх, пропускаем проверку на ракетку
   jz add_y
 check_coord_bat:
-  ldi b, 0x0b
+  ldi b, 0x0b ;сравниваем координату с линией отталкивания ракетки
   xor b, a
-  jnz add_y
-  inc a
-  mov b, a
-  ld a, ball_x
-  ldi d, check_bat
+  jnz add_y ;если находимся не на этой линии, пропускаем дальнейшую обработку
+  inc a ;смещаем координату вниз
+  mov b, a ;копируем в b
+  ld a, ball_x ;читаем координату по x
+  ldi d, check_bat ;переходим к преобразованию
   jmp coord_to_pos
 check_bat:
   mov d, a
   mov a, b
-  ld c, d
-  and c, a
+  ld c, d ;читаем байт
+  and c, a ;если ракетки не коснулись, переходим к поражению
   jz game_over
-  mov a, 0
+  mov a, 0 ;иначе меняем адрес перехода после отрисовки мяча
   st a, draw_jmp + 1
-  dec a
+  dec a ;и меняем скорость
   st a, speed_y
-  ld a, ball_y
+  ld a, ball_y ;читаем координату обратно
 add_y:
-  ld c, speed_y
-  add a, c
-  st a, ball_y
+  ld c, speed_y ;читаем скорость
+  add a, c ;прибавляем
+  st a, ball_y ;сохраняем
 ball_move_x:
-  ld a, ball_x
+  ld a, ball_x ;читаем координату по x
 check_left:
   or a, 0
-  jnz check_right
-  ldi b, 1
+  jnz check_right ;если не находимся слева, делаем проверку на правое положение
+  ldi b, 1 ;иначе меняем скорость
   st b, speed_x
-  jmp add_x
+  jmp add_x ;и переходим к изменению координаты
 check_right:
-  ldi b, 0x0f
+  ldi b, 0x0f ;сравниваем с самым правым положением
   xor b, a
-  jnz add_x
-  dec b
+  jnz add_x ;если мы не на нём, изменяем координату
+  dec b ;иначе меняем скорость (регистр b содержит 0)
   st b, speed_x
 add_x:
-  ld c, speed_x
-  add a, c
-  st a, ball_x
-  ld b, ball_y
-  ldi d, draw
+  ld c, speed_x ;читаем скорость
+  add a, c ;добавляем к координате
+  st a, ball_x ;сохраняем
+  ld b, ball_y ;читаем координату по y
+  ldi d, draw ;переходим к преобразованию
   jmp coord_to_pos
 draw:
-  st b, a
+  st b, a ;выводим мяч
 draw_jmp:
-  ldi d, key_read
-  ldi a, key_read
+  ldi d, key_read ;изменяемый адрес перехода
+  ldi a, key_read ;восстанавливаем адрес перехода
   st a, draw_jmp + 1
-  jmp d
-game_over:
-  ldi d, 0x40
+  jmp d ;переходим по адресу
+game_over: ;поражение
+  ldi d, 0x40 ;подключаем терминал
   st d, out
-  ldi c, game_over_text
+  ldi c, game_over_text ;адрес текста
 text_loop:
-  ld a, c
-  st a, d
-  inc c
-  jnz text_loop
-hlt
+  ld a, c ;читаем символ
+  st a, d ;выводим
+  inc c ;следующий символ
+  jnz text_loop ;если символы ещё остались - повторяем
+hlt ;конец
 void db 0, 0, 0, 0
-game_over_text db "GAME    OVER! "
-end equ $
+game_over_text db "GAME    OVER! " ;текст при поражении
 
 
 
