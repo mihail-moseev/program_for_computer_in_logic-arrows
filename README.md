@@ -42,3 +42,9 @@
 ### GMN (Guess My Num)
 
 [![Guess My Num](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20GMN.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20GMN.asm)
+
+---
+
+### tennis v1
+
+[![tennis v1](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20tennis%20v1.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20tennis%20v1.asm)
