@@ -105,7 +105,7 @@ win:
 lose:
   ldi c, lose_text ;адрес текста
   ldi d, start ;адрес перехода
-  ldi a, indicator ;подклбчаем цифровой индикатор
+  ldi a, indicator ;подключаем цифровой индикатор
   st a, out
   ld a, lives ;читаем кол-во жизней
   dec a ;уменьшаем
