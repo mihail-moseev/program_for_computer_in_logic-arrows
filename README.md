@@ -48,3 +48,9 @@
 ### tennis v1
 
 [![tennis v1](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20tennis%20v1.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20tennis%20v1.asm)
+
+---
+
+### casino
+
+[![tennis v1](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20casino.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20casino.asm)
