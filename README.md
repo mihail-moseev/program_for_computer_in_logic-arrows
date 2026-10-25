@@ -1,4 +1,4 @@
-<h1>программы для компьютеров в стрелочках</h1>
+<h1>программы для компьютеров в <a href="https://logic-arrows.io/">стрелочках</a></h1>
 <table>
   <tr>
     <td>
@@ -7,7 +7,7 @@
       <p>Мои программы</p>
     </td>
     <td>
-      <a href="https://logic-arrows.io/map-lVeJ9jtX"><img src="" alt="Компьютер v1"></a>
+      <a href="https://logic-arrows.io/map-lVeJ9jtX"><img src="./images of computers/computer v1.jpg" alt="Компьютер v1" width="100%"></a>
     </td>
   </tr>
   <tr>
@@ -17,7 +17,7 @@
       <p>Мои программы</p>
     </td>
     <td>
-      <a href="https://logic-arrows.io/map-computer"><img src="" alt="Компьютер v2"></a>
+      <a href="https://logic-arrows.io/map-computer"><img src="./images of computers/computer v2.jpg" alt="Компьютер v2" width="100%"></a>
     </td>
   </tr>
   <tr>
@@ -27,7 +27,7 @@
       <p>Мои программы</p>
     </td>
     <td>
-      <a href="https://logic-arrows.io/map-computer-32k"><img src="" alt="Компьютер v2 32 КБ"></a>
+      <a href="https://logic-arrows.io/map-computer-32k"><img src="./images of computers/computer v2 32 K.jpg" alt="Компьютер v2 32 КБ" width="100%"></a>
     </td>
   </tr>
 </table>
