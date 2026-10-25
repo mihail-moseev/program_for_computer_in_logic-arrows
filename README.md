@@ -1,56 +1,27 @@
-# program_for_computer_in_logic-arrows
-тут будут мои программы, на ассемблере для компьютера чубрика в logic-arrows https://logic-arrows.io/map-computer и https://logic-arrows.io/map-lVeJ9jtX
+# программы для компьютеров в стрелочках
 
-## programs
+## [Компьютер v1](https://logic-arrows.io/map-lVeJ9jtX)
 
-### test
+[Документация](https://github.com/chubrik/LogicArrows/blob/main/ru/computer-v1/README.md)
 
-[![test](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/Unknown.png)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/test)
+Мои программы
 
----
+<br>
 
-### tennis
+## [Компьютер v2](https://logic-arrows.io/map-computer)
 
-[![tennis](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20tennis.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20tennis.asm)
+[Документация](https://github.com/chubrik/LogicArrows/blob/main/ru/computer-v2/README.md)
 
----
+Мои программы
 
-### snake
+<br>
 
-[![snake](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20snake.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20snake.asm)
+## [Компьютер v2 32 КБ](https://logic-arrows.io/map-computer-32k)
 
----
+[Документация](https://github.com/chubrik/LogicArrows/blob/main/ru/computer-v2/README.md)
 
-### minesweeper
+Мои программы
 
-[![minesweeper](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20minesweeper.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20minesweeper.asm)
+<br>
 
----
-
-### 3d maze
-
-[![3d maze](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%203d%20maze.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%203d%20maze.asm)
-
----
-
-### Langton's ant
-
-[![Langton's ant](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20Langton's%20ant.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20Langton's%20ant.asm)
-
----
-
-### GMN (Guess My Num)
-
-[![Guess My Num](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20GMN.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20GMN.asm)
-
----
-
-### tennis v1
-
-[![tennis v1](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20tennis%20v1.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20tennis%20v1.asm)
-
----
-
-### casino
-
-[![tennis v1](https://raw.githubusercontent.com/mihail-moseev/program_for_computer_in_logic-arrows/main/image%20casino.jpg)](https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/code%20casino.asm)
+Так же можете ознакомится с моим [компьютером](https://github.com/mihail-moseev/computer-for-the-Steam-version)
