@@ -21,7 +21,7 @@
     <td>
       <a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%203d%20maze.asm"><img src="./images/image 3d maze.jpg" alt="3D лабиринт" width="100%"></a>
       <h2><a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%203d%20maze.asm">3D лабиринт</a></h2>
-      <p>Найдите выход из лабиринта, глядя от первого лица. 3D графика строится через рейкастинг (планируется добавить цветную графику)</p>
+      <p>Найдите выход из лабиринта, глядя от первого лица. 3D графика строится через рейкастинг</p>
     </td>
   </tr>
   <tr>
