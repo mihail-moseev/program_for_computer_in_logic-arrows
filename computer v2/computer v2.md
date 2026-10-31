@@ -21,7 +21,8 @@
     <td>
       <a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%203d%20maze.asm"><img src="./images/image 3D maze.jpg" alt="3D лабиринт" width="100%"></a>
       <h2><a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%203d%20maze.asm">3D лабиринт</a></h2>
-      <p>Найдите выход из лабиринта, глядя от первого лица. 3D графика строится через рейкастинг</p>
+      <p>Найдите выход из лабиринта, глядя от первого лица. 3D графика строится через рейкастинг.</p>
+      <p>Игра занимает весть доступный объём памяти 1 КБ и в целях производительности выложена на <a href="https://logic-arrows.io/map-fovDthZX">отдельной карте</a></p>
     </td>
   </tr>
   <tr>
