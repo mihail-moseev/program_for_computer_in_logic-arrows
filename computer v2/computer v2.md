@@ -2,9 +2,9 @@
 <table>
   <tr>
     <td>
-      <a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%20tennis.asm"><img src="./images/image tennis.jpg" alt="Теннис" width="100%"></a>
-      <h2><a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%20tennis.asm">Теннис</a></h2>
-      <p>Отбивайте мяч ракеткой, зарабатывая очки (планируется переделать в арканоид)</p>
+      <a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%20arkanoid.asm"><img src="./images/image arkanoid.jpg" alt="Арканоид" width="100%"></a>
+      <h2><a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%20arkanoid.asm">Арканоид</a></h2>
+      <p>Отбивайте мяч ракеткой, меняйте его направление, разбивайте блоки разных цветов, чтобы сломать все</p>
     </td>
     <td>
       <a href="https://github.com/mihail-moseev/program_for_computer_in_logic-arrows/blob/main/computer%20v2/programs/code%20snake.asm"><img src="./images/image snake.jpg" alt="Змейка" width="100%"></a>
